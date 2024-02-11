@@ -48,6 +48,8 @@ public:
 	uint32_t GetUniqueCID() const { return m_UniqueClientID; }
 	int GetClientVersion() const;
 	bool SetTimerType(int TimerType);
+	void SetCurrentAnchor(vec2 Pos);
+	vec2 GetCurrentAnchor();
 
 	void Tick();
 	void PostTick();
@@ -152,6 +154,8 @@ private:
 	int m_OverrideEmote;
 	int m_OverrideEmoteReset;
 	bool m_Halloween;
+
+	vec2 m_CurrentAnchor;
 
 public:
 	enum

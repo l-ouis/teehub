@@ -28,6 +28,9 @@ CPlayer::CPlayer(CGameContext *pGameServer, uint32_t UniqueClientID, int ClientI
 	m_NumInputs = 0;
 	Reset();
 	GameServer()->Antibot()->OnPlayerInit(m_ClientID);
+
+	// Current Anchor in unreachable location (Maybe make this an optional or add AnchorExists function later...)
+	m_CurrentAnchor = vec2(-1, -1);
 }
 
 CPlayer::~CPlayer()
@@ -593,6 +596,16 @@ void CPlayer::Respawn(bool WeakHook)
 	}
 }
 
+void CPlayer::SetCurrentAnchor(vec2 Pos)
+{
+	m_CurrentAnchor = Pos;
+}
+
+vec2 CPlayer::GetCurrentAnchor()
+{
+	return m_CurrentAnchor;
+}
+
 CCharacter *CPlayer::ForceSpawn(vec2 Pos)
 {
 	m_Spawning = false;
@@ -681,7 +694,7 @@ void CPlayer::TryRespawn()
 {
 	vec2 SpawnPos;
 
-	if(!GameServer()->m_pController->CanSpawn(m_Team, &SpawnPos, GameServer()->GetDDRaceTeam(m_ClientID)))
+	if(!GameServer()->m_pController->CanSpawn(m_Team, &SpawnPos, GameServer()->GetDDRaceTeam(m_ClientID), this))
 		return;
 
 	m_WeakHookSpawn = false;

@@ -22,7 +22,7 @@ class IGameController
 {
 	friend class CSaveTeam; // need access to GameServer() and Server()
 
-	std::vector<vec2> m_avSpawnPoints[3];
+	std::vector<vec2> m_avSpawnPoints[4];
 
 	class CGameContext *m_pGameServer;
 	class CConfig *m_pConfig;
@@ -53,7 +53,7 @@ protected:
 	};
 
 	float EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos, int DDTeam);
-	void EvaluateSpawnType(CSpawnEval *pEval, int Type, int DDTeam);
+	void EvaluateSpawnType(CSpawnEval *pEval, int Type, int DDTeam, CPlayer *pPlayer);
 
 	void ResetGame();
 
@@ -137,7 +137,7 @@ public:
 	virtual void Snap(int SnappingClient);
 
 	//spawn
-	virtual bool CanSpawn(int Team, vec2 *pOutPos, int DDTeam);
+	virtual bool CanSpawn(int Team, vec2 *pOutPos, int DDTeam, CPlayer *pPlayer);
 
 	virtual void DoTeamChange(class CPlayer *pPlayer, int Team, bool DoChatMsg = true);
 	/*

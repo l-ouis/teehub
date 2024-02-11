@@ -1504,6 +1504,14 @@ void CCharacter::HandleTiles(int Index)
 		m_Core.m_LiveFrozen = false;
 	}
 
+	// respawn anchor
+	if(m_TileIndex == ENTITY_RESPAWN_ANCHOR + 191)
+	{
+		float tilePosX = floor(m_Pos.x / 32) + 0.50;
+		float tilePosY = floor(m_Pos.y / 32) + 0.50;
+		GetPlayer()->SetCurrentAnchor(vec2(tilePosX, tilePosY));
+	}
+
 	// endless hook
 	if(((m_TileIndex == TILE_EHOOK_ENABLE) || (m_TileFIndex == TILE_EHOOK_ENABLE)))
 	{
@@ -1895,7 +1903,7 @@ void CCharacter::HandleTiles(int Index)
 		}
 		// if no checkpointout have been found (or if there no recorded checkpoint), teleport to start
 		vec2 SpawnPos;
-		if(GameServer()->m_pController->CanSpawn(m_pPlayer->GetTeam(), &SpawnPos, GameServer()->GetDDRaceTeam(GetPlayer()->GetCID())))
+		if(GameServer()->m_pController->CanSpawn(m_pPlayer->GetTeam(), &SpawnPos, GameServer()->GetDDRaceTeam(GetPlayer()->GetCID()), GetPlayer()))
 		{
 			m_Core.m_Pos = SpawnPos;
 			m_Core.m_Vel = vec2(0, 0);
@@ -1930,7 +1938,7 @@ void CCharacter::HandleTiles(int Index)
 		}
 		// if no checkpointout have been found (or if there no recorded checkpoint), teleport to start
 		vec2 SpawnPos;
-		if(GameServer()->m_pController->CanSpawn(m_pPlayer->GetTeam(), &SpawnPos, GameServer()->GetDDRaceTeam(GetPlayer()->GetCID())))
+		if(GameServer()->m_pController->CanSpawn(m_pPlayer->GetTeam(), &SpawnPos, GameServer()->GetDDRaceTeam(GetPlayer()->GetCID()), GetPlayer()))
 		{
 			m_Core.m_Pos = SpawnPos;
 

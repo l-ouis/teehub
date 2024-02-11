@@ -95,6 +95,7 @@ enum
 	ENTITY_DRAGGER_STRONG_NW,
 	//Doors
 	ENTITY_DOOR = 49,
+	ENTITY_RESPAWN_ANCHOR,
 	//End Of Lower Tiles
 	NUM_ENTITIES,
 	//Start From Top Left

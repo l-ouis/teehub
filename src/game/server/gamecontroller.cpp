@@ -106,7 +106,7 @@ float IGameController::EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos, int DDTeam)
 	return Score;
 }
 
-void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, int DDTeam)
+void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, int DDTeam, CPlayer *pPlayer)
 {
 	// j == 0: Find an empty slot, j == 1: Take any slot if no empty one found
 	for(int j = 0; j < 2 && !pEval->m_Got; j++)
@@ -115,7 +115,15 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, int DDTeam)
 		for(const vec2 &SpawnPoint : m_avSpawnPoints[Type])
 		{
 			vec2 P = SpawnPoint;
-			if(j == 0)
+			// TODO: FIX THIS LATER :SKULL:
+			// character.cpp line 1510, instead of using player position, use tile position. Then we do not have to check for within range
+			vec2 currentAnchor = pPlayer->GetCurrentAnchor();
+			bool jankPosCheck = (abs(((P.x - 16.0f) / 32) - currentAnchor.x) < 2 && abs(((P.y - 16.0f) / 32) - currentAnchor.y) < 2);
+			if(Type == 3 && !jankPosCheck)
+			{
+				continue;
+			}
+			else if(j == 0)
 			{
 				// check if the position is occupado
 				CEntity *apEnts[MAX_CLIENTS];
@@ -155,16 +163,17 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, int DDTeam)
 	}
 }
 
-bool IGameController::CanSpawn(int Team, vec2 *pOutPos, int DDTeam)
+bool IGameController::CanSpawn(int Team, vec2 *pOutPos, int DDTeam, CPlayer *pPlayer)
 {
 	// spectators can't spawn
 	if(Team == TEAM_SPECTATORS)
 		return false;
 
 	CSpawnEval Eval;
-	EvaluateSpawnType(&Eval, 0, DDTeam);
-	EvaluateSpawnType(&Eval, 1, DDTeam);
-	EvaluateSpawnType(&Eval, 2, DDTeam);
+	EvaluateSpawnType(&Eval, 3, DDTeam, pPlayer);
+	EvaluateSpawnType(&Eval, 0, DDTeam, pPlayer);
+	EvaluateSpawnType(&Eval, 1, DDTeam, pPlayer);
+	EvaluateSpawnType(&Eval, 2, DDTeam, pPlayer);
 
 	*pOutPos = Eval.m_Pos;
 	return Eval.m_Got;
@@ -186,9 +195,14 @@ bool IGameController::OnEntity(int Index, int x, int y, int Layer, int Flags, bo
 	aSides[6] = GameServer()->Collision()->Entity(x - 1, y, Layer);
 	aSides[7] = GameServer()->Collision()->Entity(x - 1, y + 1, Layer);
 
-	if(Index >= ENTITY_SPAWN && Index <= ENTITY_SPAWN_BLUE && Initial)
+	if((Index == ENTITY_RESPAWN_ANCHOR || (Index >= ENTITY_SPAWN && Index <= ENTITY_SPAWN_BLUE)) && Initial)
 	{
-		const int Type = Index - ENTITY_SPAWN;
+		// Respawn Anchors have an index of 50
+		int Type = Index - ENTITY_SPAWN;
+		if(Index == ENTITY_RESPAWN_ANCHOR)
+		{
+			Type = 3;
+		}
 		m_avSpawnPoints[Type].push_back(Pos);
 	}
 	else if(Index == ENTITY_DOOR)
